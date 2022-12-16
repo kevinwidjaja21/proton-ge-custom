@@ -26,13 +26,16 @@
     git reset --hard HEAD
     git clean -xdf
 
-    echo "add valve dxvk patches"
+    echo "DXVK: add valve dxvk patches"
     patch -Np1 < ../patches/dxvk/proton-dxvk_avoid_spamming_log_with_requests_for_IWineD3D11Texture2D.patch
     patch -Np1 < ../patches/dxvk/proton-dxvk_add_new_dxvk_config_library.patch
 
-    # this needs to be the last patch in the list.. because reasons?
-    echo "add dxvk async patch"
-    patch -Np1 < ../patches/dxvk/dxvk-async.patch
+    # https://github.com/doitsujin/dxvk/pull/2675
+    echo "DXVK: [dxgi] Leave fullscreen mode when window looses focus"
+    patch -Np1 < ../patches/dxvk/2675.patch
+
+    echo "DXVK: add dxvk async patch"
+    patch -Np1 < ../patches/dxvk/dxvk-async.patch   
     cd ..
 
     #WINE STAGING

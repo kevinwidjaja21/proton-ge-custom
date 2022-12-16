@@ -1,5 +1,5 @@
-# proton-ge-custom
-# Please note, this is a custom build of proton, and is -not- affiliated with Valve's proton. 
+# proton-ge-custom - FSX
+# Please note, this is a custom build of proton for FSx only, and is -not- affiliated with Valve's proton and GloriousEggroll custom proton FSX. 
 # Please also note I do not provide the flatpak of proton-GE, and I do not provide the AUR version of proton-GE. I will not assist with those.
 # The only version of proton-GE that I provide and will assist with builds of is the one provided within this repository, using the vagrant build system documented here.
 # I cannot validate the accuracy or functionality of other builds that have not been built using the vagrant build system included here.
@@ -9,6 +9,11 @@
 # Instead, contact me on Discord about the issue:
 
 https://discord.gg/6y3BdzC
+
+# Changes made from version GE 7.0rc3
+- Update dxvk to the latest pre 2.0 version use by GloriousEggroll including the corresponding patch (Commit [091beba](https://github.com/GloriousEggroll/proton-ge-custom/tree/9dc17dec4088b59977e769cbceab12fcc98c24bd)).
+- (Planned) Add protonfixes for FSX.
+- (Considered) Add d3d8tod9 to the repo.
 
 ## Table of contents
 
