@@ -1,5 +1,13 @@
+name: G9_exp
+
 on:
-  workflow_dispatch:
+
+
+  push:
+
+    branches:
+
+      - experimental
 
 jobs:
   build-proton-ge:
