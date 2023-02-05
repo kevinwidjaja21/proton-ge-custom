@@ -1,0 +1,71 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  build-proton-ge:
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: Get branch names
+        id: branch-name
+        uses: tj-actions/branch-names@v5.1
+    
+      - name: Clone repo
+        run: git clone -b ${{ steps.branch-name.outputs.current_branch }} --jobs 20 --recurse-submodules ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY} .
+
+      - name: Get Proton Versions
+        run: echo "RELEASE_VERSION=$(cat VERSION)" >> $GITHUB_ENV
+        
+      - name: Display version
+        run: echo ${{ env.RELEASE_VERSION }}
+
+      - name: Install dependencies apt
+        run: sudo apt update && sudo apt-get install -y ccache fontforge-nox
+
+      - name: apply patches
+        run: ./patches/protonprep-valve-staging.sh  || true
+
+      - name: Create dir structure
+        run: mkdir build
+
+      - name: Create/Download ccache
+        uses: actions/cache@v2
+        with:
+          path: ~/.ccache
+          key: ccache-proton-${{ github.run_id }}
+          restore-keys: |
+            ccache-proton
+
+      - name: Configure build proton
+        working-directory: ./build/
+        run: ../configure.sh --build-name="${{ env.RELEASE_VERSION }}" --enable-ccache
+
+      # Build name following convention: Proton-<tag>
+      - name: Build proton
+        working-directory: ./build/
+        run: make dist
+
+      - name: Rename directory
+        working-directory: ./build/
+        run: mv dist ${{ env.RELEASE_VERSION }}
+
+      - name: Move files to their right folder
+        working-directory: ./build/${{ env.RELEASE_VERSION }}/protonfixes/
+        run: |
+          mv cabextract ../files/bin/ && \
+          mv libmspack.so.0 ../files/lib64/ && \
+          mv libmspack.so.0.1.0 ../files/lib64/ && \
+          rm cabextract_1.9-1.debian.tar.xz libmspack_0.10.1-1.debian.tar.xz
+
+      - name: Archive build
+        working-directory: ./build/
+        run: tar -czvf ${{ env.RELEASE_VERSION }}.tar.gz ${{ env.RELEASE_VERSION }}
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.PROTON_GE_GITHUB_ACTIONS_BUILD }}
+          file: build/${{ env.RELEASE_VERSION }}.tar.gz
+          file_glob: true
+          tag: "${{ env.RELEASE_VERSION }}-build-${{ github.run_number }}"
+          overwrite: false
