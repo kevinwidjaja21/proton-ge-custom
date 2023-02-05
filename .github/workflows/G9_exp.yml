@@ -1,13 +1,9 @@
 name: G9_exp
 
 on:
-
-
   push:
-
     branches:
-
-      - experimental
+      - G9_exp
 
 jobs:
   build-proton-ge:
