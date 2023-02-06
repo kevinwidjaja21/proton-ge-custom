@@ -65,10 +65,7 @@ jobs:
         working-directory: ./build/
         run: tar -czvf ${{ env.RELEASE_VERSION }}-G9.tar.gz ${{ env.RELEASE_VERSION }}
 
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
         with:
-          file: build/${{ env.RELEASE_VERSION }}-G9.tar.gz
-          file_glob: true
-          tag: "${{ env.RELEASE_VERSION }}-build-${{ github.run_number }}"
-          overwrite: false
+          path: build/${{ env.RELEASE_VERSION }}-G9.tar.gz
