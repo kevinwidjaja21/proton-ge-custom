@@ -63,12 +63,12 @@ jobs:
 
       - name: Copy gallium nine pre-compiled file
         run: |
-          mkdir ./build/files/lib64/wine/galliumnine/
-          mkdir ./build/files/lib/wine/galliumnine/
-          cp -f ./gallium_nine_temp/lib64/d3d9-nine.dll.so ./build/files/lib64/wine/galliumnine/d3d9-nine.dll.so
-          cp -f ./gallium_nine_temp/lib32/d3d9-nine.dll.so ./build/files/lib/wine/galliumnine/d3d9-nine.dll.so
-          cp -f ./gallium_nine_temp/bin64/ninewinecfg.exe.so ./build/files/lib64/wine/galliumnine/ninewinecfg.exe.so
-          cp -f ./gallium_nine_temp/bin32/ninewinecfg.exe.so ./build/files/lib/wine/galliumnine/ninewinecfg.exe.so
+          mkdir ./build/${{ env.RELEASE_VERSION }}/files/lib64/wine/galliumnine
+          mkdir ./build/${{ env.RELEASE_VERSION }}/files/lib/wine/galliumnine
+          cp -f ./gallium_nine_temp/lib64/d3d9-nine.dll.so ./build/${{ env.RELEASE_VERSION }}/files/lib64/wine/galliumnine/d3d9-nine.dll.so
+          cp -f ./gallium_nine_temp/lib32/d3d9-nine.dll.so ./build/${{ env.RELEASE_VERSION }}/files/lib/wine/galliumnine/d3d9-nine.dll.so
+          cp -f ./gallium_nine_temp/bin64/ninewinecfg.exe.so ./build/${{ env.RELEASE_VERSION }}/files/lib64/wine/galliumnine/ninewinecfg.exe.so
+          cp -f ./gallium_nine_temp/bin32/ninewinecfg.exe.so ./build/${{ env.RELEASE_VERSION }}/files/lib/wine/galliumnine/ninewinecfg.exe.so
 
       - name: Archive build
         working-directory: ./build/
