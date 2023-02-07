@@ -76,3 +76,6 @@
 [submodule "glslang"]
 	path = glslang
 	url = https://github.com/KhronosGroup/glslang
+[submodule "wine-nine-standalone"]
+	path = wine-nine-standalone
+	url = https://github.com/iXit/wine-nine-standalone.git

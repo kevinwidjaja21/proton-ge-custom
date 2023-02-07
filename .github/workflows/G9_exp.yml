@@ -61,11 +61,19 @@ jobs:
           mv libmspack.so.0.1.0 ../files/lib64/ && \
           rm cabextract_1.9-1.debian.tar.xz libmspack_0.10.1-1.debian.tar.xz
 
+      - name: Copy gallium nine pre-compiled file
+        run: |
+          cp -f ./gallium_nine_temp/lib64/d3d9-nine.dll.so ./build/files/lib64/wine/galliumnine/d3d9-nine.dll.so
+          cp -f ./gallium_nine_temp/lib32/d3d9-nine.dll.so ./build/files/lib/wine/galliumnine/d3d9-nine.dll.so
+          cp -f ./gallium_nine_temp/bin64/ninewinecfg.exe.so ./build/files/lib64/wine/galliumnine/ninewinecfg.exe.so
+          cp -f ./gallium_nine_temp/bin32/ninewinecfg.exe.so ./build/files/lib/wine/galliumnine/ninewinecfg.exe.so
+
       - name: Archive build
         working-directory: ./build/
         run: tar -czvf ${{ env.RELEASE_VERSION }}-G9.tar.gz ${{ env.RELEASE_VERSION }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
+          name: ${{ env.RELEASE_VERSION }}-G9
           path: build/${{ env.RELEASE_VERSION }}-G9.tar.gz
