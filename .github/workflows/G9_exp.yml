@@ -54,7 +54,7 @@ jobs:
         run: mv dist ${{ env.RELEASE_VERSION }}
 
       - name: Move files to their right folder
-        working-directory: ./build/${{ env.RELEASE_VERSION }}/protonfixes/gi
+        working-directory: ./build/${{ env.RELEASE_VERSION }}/protonfixes/
         run: |
           mv cabextract ../files/bin/ && \
           mv libmspack.so.0 ../files/lib64/ && \
