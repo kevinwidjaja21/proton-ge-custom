@@ -344,6 +344,8 @@
 ./drive_c/windows/syswow64/msisip.dll
 ./drive_c/windows/syswow64/wldap32.dll
 ./drive_c/windows/syswow64/d3d9.dll
+./drive_c/windows/syswow64/d3d9-nine.dll
+./drive_c/windows/syswow64/ninewinecfg.exe
 ./drive_c/windows/syswow64/d3dcompiler_41.dll
 ./drive_c/windows/syswow64/api-ms-win-core-com-l1-1-1.dll
 ./drive_c/windows/syswow64/setupx.dll
@@ -1284,6 +1286,8 @@
 ./drive_c/windows/system32/msisip.dll
 ./drive_c/windows/system32/wldap32.dll
 ./drive_c/windows/system32/d3d9.dll
+./drive_c/windows/system32/d3d9-nine.dll
+./drive_c/windows/system32/ninewinecfg.exe
 ./drive_c/windows/system32/d3dcompiler_41.dll
 ./drive_c/windows/system32/api-ms-win-core-com-l1-1-1.dll
 ./drive_c/windows/system32/fsutil.exe

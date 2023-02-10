@@ -1085,6 +1085,17 @@ class CompatData:
                         prefix=self.prefix_dir, track_file=tracked_files, link_debug=True)
                 try_copy(g_proton.lib_dir + "vkd3d/libvkd3d-shader-1.dll", "drive_c/windows/syswow64",
                         prefix=self.prefix_dir, track_file=tracked_files, link_debug=True)
+                
+                #copy galliumnine files
+                try_copy(g_proton.lib64_dir + "wine/galliumnine/d3d9-nine.dll", "drive_c/windows/system32",
+                        prefix=self.prefix_dir, track_file=tracked_files, link_debug=True)
+                try_copy(g_proton.lib_dir + "wine/galliumnine/d3d9-nine.dll", "drive_c/windows/syswow64",
+                        prefix=self.prefix_dir, track_file=tracked_files, link_debug=True)
+                try_copy(g_proton.lib64_dir + "wine/galliumnine/ninewinecfg.exe", "drive_c/windows/system32",
+                        prefix=self.prefix_dir, track_file=tracked_files, link_debug=True)
+                try_copy(g_proton.lib_dir + "wine/galliumnine/ninewinecfg.exe", "drive_c/windows/syswow64",
+                        prefix=self.prefix_dir, track_file=tracked_files, link_debug=True)
+                g_session.dlloverrides["d3d9-nine"] = "n"
 
                 if use_wined3d:
                     dxvkfiles = []
@@ -1095,7 +1106,7 @@ class CompatData:
                     dxvkfiles = []
                     vkd3d_protonfiles = []
                     wined3dfiles = []
-                    galliumninefiles = ["d3d9-nine.dll", "ninewinecfg.exe"]
+                    galliumninefiles = ["d3d9"]
                 else:
                     dxvkfiles = ["d3d11", "d3d10core", "d3d9"]
                     vkd3d_protonfiles = ["d3d12"]
@@ -1121,10 +1132,10 @@ class CompatData:
                     g_session.dlloverrides[f] = "n"
 
                 for f in galliumninefiles:
-                    try_copy(g_proton.lib64_dir + "wine/galliumnine/" + f , "drive_c/windows/system32",
-                            prefix=self.prefix_dir, track_file=tracked_files, link_debug=True)
-                    try_copy(g_proton.lib_dir + "wine/galliumnine/" + f , "drive_c/windows/syswow64",
-                            prefix=self.prefix_dir, track_file=tracked_files, link_debug=True)
+                    os.remove(self.prefix_dir + "drive_c/windows/system32/" + f + ".dll")
+                    os.remove(self.prefix_dir + "drive_c/windows/syswow64/" + f + ".dll")
+                    os.symlink(self.prefix_dir + "drive_c/windows/system32/" + f + "-nine.dll", self.prefix_dir + "drive_c/windows/system32/" + f + ".dll")
+                    os.symlink(self.prefix_dir + "drive_c/windows/syswow64/" + f + "-nine.dll", self.prefix_dir + "drive_c/windows/syswow64/" + f + ".dll")
                     g_session.dlloverrides[f] = "n"
 
                 for f in vkd3d_protonfiles:
@@ -1638,8 +1649,8 @@ class Session:
 
         if "galliumnine" in self.compat_config:
             self.run_proc([g_proton.wine64_bin, "ninewinecfg.exe -e"])
-            #add enviroment variable for d3d9adapter here
-
+            self.env["D3D_MODULE_PATH"] = "/tmp/d3d/d3dadapter9.so.1"
+        
         if "enablenvapi" in self.compat_config:
             self.env["DXVK_ENABLE_NVAPI"] = "1"
 
