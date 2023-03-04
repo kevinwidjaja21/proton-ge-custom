@@ -23,8 +23,44 @@ jobs:
       - name: Display version
         run: echo ${{ env.RELEASE_VERSION }}
 
+      - name: Setup multiarch
+        run: sudo dpkg --add-architecture i386
+
       - name: Install dependencies apt
-        run: sudo apt update && sudo apt-get install -y ccache fontforge-nox
+        run: sudo apt update -y && sudo apt-get install -y ccache fontforge-nox
+
+      - name: Install dependencies gallium nine
+        run: >
+          sudo apt-get install -y
+          gcc-multilib
+          libc6-dev:i386
+          meson
+          libwine
+          libwine:i386
+          libwine-dev
+          libdrm-dev
+          libdrm-dev:i386
+          libx11-xcb-dev
+          libx11-xcb-dev:i386
+          libxcb-present-dev
+          libxcb-present-dev:i386
+          libxcb-dri3-dev
+          libxcb-dri3-dev:i386
+          libxcb-dri2-0-dev
+          libxcb-dri2-0-dev:i386
+          libegl1-mesa-dev
+          libegl1-mesa-dev:i386
+          libgl1-mesa-dev
+          libgl1-mesa-dev:i386
+          libd3dadapter9-mesa-dev
+          libd3dadapter9-mesa-dev:i386
+      
+      - name: Install dependencies workaround gallium nine
+        run: |
+          # libwine-dev and libwine-dev:i386 conflict with each other
+          # copy the native 64bit one to /tmp, which also avoids a winegcc multiarch bug
+          sudo cp -av /usr/lib/x86_64-linux-gnu/wine /tmp/wine64
+          sudo apt-get install -y libwine-dev:i386
 
       - name: apply patches
         run: ./patches/protonprep-valve-staging.sh  || true
@@ -33,7 +69,7 @@ jobs:
         run: mkdir build
 
       - name: Create/Download ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.ccache
           key: ccache-proton-${{ github.run_id }}
@@ -43,6 +79,13 @@ jobs:
       - name: Configure build proton
         working-directory: ./build/
         run: ../configure.sh --build-name="${{ env.RELEASE_VERSION }}" --enable-ccache
+
+      - name: Compile Gallium Nine
+        env:
+          WINE64_LIBDIR: /tmp/wine64
+          WINE32_LIBDIR: /usr/lib/i386-linux-gnu/wine
+        working-directory: ./wine-nine-standalone/
+        run: ./release.sh -o "g9_temp" -- -Ddri2=true -Ddistro-independent=true
 
       # Build name following convention: Proton-<tag>
       - name: Build proton
@@ -61,14 +104,14 @@ jobs:
           mv libmspack.so.0.1.0 ../files/lib64/ && \
           rm cabextract_1.9-1.debian.tar.xz libmspack_0.10.1-1.debian.tar.xz
 
-      - name: Copy gallium nine pre-compiled file
+      - name: Copy gallium nine output file
         run: |
           mkdir ./build/${{ env.RELEASE_VERSION }}/files/lib64/wine/galliumnine/
           mkdir ./build/${{ env.RELEASE_VERSION }}/files/lib/wine/galliumnine/
-          cp -f ./gallium_nine_temp/lib64/d3d9-nine.dll.so ./build/${{ env.RELEASE_VERSION }}/files/lib64/wine/galliumnine/d3d9-nine.dll
-          cp -f ./gallium_nine_temp/lib32/d3d9-nine.dll.so ./build/${{ env.RELEASE_VERSION }}/files/lib/wine/galliumnine/d3d9-nine.dll
-          cp -f ./gallium_nine_temp/bin64/ninewinecfg.exe.so ./build/${{ env.RELEASE_VERSION }}/files/lib64/wine/galliumnine/ninewinecfg.exe
-          cp -f ./gallium_nine_temp/bin32/ninewinecfg.exe.so ./build/${{ env.RELEASE_VERSION }}/files/lib/wine/galliumnine/ninewinecfg.exe
+          cp -f ./wine-nine-standalone/gallium-nine-standalone/lib64/d3d9-nine.dll.so ./build/${{ env.RELEASE_VERSION }}/files/lib64/wine/galliumnine/d3d9-nine.dll
+          cp -f ./wine-nine-standalone/gallium-nine-standalone/lib32/d3d9-nine.dll.so ./build/${{ env.RELEASE_VERSION }}/files/lib/wine/galliumnine/d3d9-nine.dll
+          cp -f ./wine-nine-standalone/gallium-nine-standalone/bin64/ninewinecfg.exe.so ./build/${{ env.RELEASE_VERSION }}/files/lib64/wine/galliumnine/ninewinecfg.exe
+          cp -f ./wine-nine-standalone/gallium-nine-standalone/bin32/ninewinecfg.exe.so ./build/${{ env.RELEASE_VERSION }}/files/lib/wine/galliumnine/ninewinecfg.exe
 
       - name: Archive build
         working-directory: ./build/
